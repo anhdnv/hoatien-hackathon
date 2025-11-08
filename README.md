@@ -1,23 +1,19 @@
-# IT Help Desk Assistant with LangChain and Pinecone
+# IT Technical Support
 
-An intelligent IT Help Desk chatbot leveraging LangChain, Azure OpenAI, Pinecone vector database, and Tavily for comprehensive IT support assistance.
+An intelligent IT Help Desk chatbot leveraging LangChain, Azure OpenAI, and ChromaDB for comprehensive IT support assistance.
 
 ## Features
 
 - Natural language understanding using Azure OpenAI and LangChain
-- Efficient knowledge retrieval with Pinecone vector database
-- Web search capabilities using Tavily API for enhanced responses
-- Text-to-speech support with automatic language detection
+- Efficient knowledge retrieval with a local ChromaDB vector database
 - Conversational memory for context-aware assistance
-- Interactive chat interface
+- Interactive chat interface with language selection (English/Vietnamese)
 - Logging and detailed conversation history
 
 ## Prerequisites
 
 - Python 3.8+
 - Azure OpenAI API access
-- Pinecone API access
-- Tavily API key
 
 ## Setup
 
@@ -29,7 +25,7 @@ pip install -r requirements.txt
 
 2. Configure environment variables:
 
-- Copy `.env.template` to `.env`
+- Create a `.env` file in the root directory (or copy from `.env.template`).
 - Add your API keys and configurations:
 
   ```
@@ -38,15 +34,8 @@ pip install -r requirements.txt
   AZURE_OPENAI_API_VERSION=your_version
   AZURE_OPENAI_ENDPOINT=your_endpoint
   AZURE_OPENAI_DEPLOYMENT=your_deployment
+  AZURE_OPENAI_EMBEDDING_KEY=your_embedding_key
   AZURE_OPENAI_EMBEDDING_DEPLOYMENT=your_embedding_deployment
-
-  # Pinecone
-  PINECONE_API_KEY=your_key
-  PINECONE_ENVIRONMENT=your_environment
-  PINECONE_INDEX_NAME=your_index_name
-
-  # Tavily
-  TAVILY_API_KEY=your_key
   ```
 
 3. Run the application:
@@ -57,6 +46,24 @@ python src/main.py
 
 The application will start on http://localhost:5000
 
+## Updating Knowledge Base
+
+When you modify `src/docs/Project_Documents.md`, update ChromaDB:
+
+```bash
+cd src
+python tools/refresh_chromadb.py
+```
+
+The script will:
+
+- Delete old ChromaDB collection
+- Read updated Project_Documents.md
+- Generate new embeddings with Azure OpenAI
+- Save to local ChromaDB
+
+**Time required:** < 1 minute
+
 ## Project Structure
 
 ```
@@ -64,18 +71,27 @@ The application will start on http://localhost:5000
 ├── README.md
 ├── requirements.txt            # Project dependencies
 ├── .env                       # Environment variables
-├── .env.template              # Template for environment variables
+├── .env.template              # Environment template
 └── src/
     ├── main.py               # Flask application entry point
-    ├── chatbot.py            # Core chatbot implementation with LangChain
-    ├── tts_service.py        # Text-to-speech service
+    ├── chatbot.py            # Core chatbot implementation with LangChain and ChromaDB
     ├── utils.py              # Utility functions
+    ├── local_chromadb/       # Local ChromaDB storage
+    ├── docs/
+    │   └── Project_Documents.md # Knowledge base file
+    ├── tools/
+    │   └── refresh_chromadb.py  # Script to update ChromaDB
+    ├── test/
+    │   ├── test_chatbot_contact.py
+    │   └── test_chromadb_insert.py
     ├── static/
     │   ├── script.js         # Frontend JavaScript
     │   ├── style.css         # Frontend styles
-    │   └── audio/           # Generated audio files
-    └── templates/
-        └── index.html        # Main chat interface
+    │   └── audio/            # Directory for audio files
+    ├── templates/
+    │   └── index.html        # Main chat interface
+    └── src/
+        └── static/           # Additional static assets
 ```
 
 ## License

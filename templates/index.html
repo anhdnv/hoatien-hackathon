@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>IT Help Desk Chatbot</title>
+    <title>IT Technical Support Chatbot</title>
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500&display=swap"
@@ -15,36 +15,47 @@
   </head>
   <body>
     <div class="chat-container">
+      <div class="chat-header">
+        <div class="language-toggle-container">
+          <span class="lang-label">VI</span>
+          <label class="toggle-switch language-toggle">
+            <input type="checkbox" id="language-toggle-checkbox" />
+            <span class="slider"></span>
+          </label>
+          <span class="lang-label">EN</span>
+        </div>
+        <button
+          id="clear-button"
+          class="clear-button"
+          title="Clear conversation"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path
+              fill-rule="evenodd"
+              d="M16.5 4.478v.227a48.816 48.816 0 013.878.512.75.75 0 11-.256 1.478l-.209-.035-1.005 13.07a3 3 0 01-2.991 2.77H8.084a3 3 0 01-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 01-.256-1.478A48.567 48.567 0 017.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 013.369 0c1.603.051 2.815 1.387 2.815 2.951zm-6.136-1.452a51.196 51.196 0 013.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 00-6 0v-.113c0-.794.609-1.428 1.364-1.452zm-.355 5.945a.75.75 0 10-1.5.058l.347 9a.75.75 0 101.499-.058l-.346-9zm5.48.058a.75.75 0 10-1.498-.058l-.347 9a.75.75 0 001.5.058l.345-9z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </button>
+      </div>
       <div class="chat-display" id="chat-display">
         <div class="message bot">
           <p lang="vi">
             Xin chào! Tôi là trợ lý IT ảo. Bạn cần hỗ trợ vấn đề gì hôm nay?
           </p>
-          <p lang="en">
+          <p lang="en" style="display: none">
             Hello! I am your virtual IT assistant. What issue do you need
             assistance with today?
-          </p>
-          <p lang="ja">
-            こんにちは！私は仮想ITアシスタントです。今日、どのような問題でお困りですか？
-          </p>
-          <p lang="ko">
-            안녕하세요! 저는 가상 IT 지원 도우미입니다. 오늘 어떤 문제에 대한
-            도움이 필요하신가요?
-          </p>
-          <p lang="zh">
-            大家好！我是您的虚拟IT助理。您今天需要哪些方面的帮助？
           </p>
         </div>
       </div>
 
       <div class="chat-input-area">
         <div class="input-wrapper">
-          <div class="tts-controls">
-            <label class="tts-toggle">
-              <input type="checkbox" id="tts-enabled" checked />
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
           <input
             type="text"
             id="user-input"

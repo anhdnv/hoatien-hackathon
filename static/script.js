@@ -2,8 +2,45 @@ document.addEventListener("DOMContentLoaded", () => {
   const userInput = document.getElementById("user-input");
   const sendButton = document.getElementById("send-button");
   const chatDisplay = document.getElementById("chat-display");
-  const ttsEnabled = document.getElementById("tts-enabled");
-  // Các biến cho popup cũ đã bị loại bỏ
+  const languageToggle = document.getElementById("language-toggle-checkbox");
+  const clearButton = document.getElementById("clear-button");
+
+  let currentLanguage = "vi"; // Default language
+
+  const translations = {
+    vi: {
+      placeholder: "Nhập câu hỏi của bạn...",
+      greeting:
+        "Xin chào! Tôi là trợ lý IT ảo. Bạn cần hỗ trợ vấn đề gì hôm nay?",
+      errorMessage: "Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại sau.",
+      clearConfirm: "Bạn có chắc chắn muốn xóa toàn bộ hội thoại?",
+    },
+    en: {
+      placeholder: "Type your question here...",
+      greeting:
+        "Hello! I am your virtual IT assistant. What issue do you need assistance with today?",
+      errorMessage: "Sorry, an error occurred. Please try again later.",
+      clearConfirm: "Are you sure you want to clear the entire conversation?",
+    },
+  };
+
+  const setLanguage = (lang) => {
+    currentLanguage = lang;
+    userInput.placeholder = translations[lang].placeholder;
+
+    // Show/hide initial greeting messages
+    document.querySelectorAll(".message.bot p[lang]").forEach((p) => {
+      p.style.display = p.getAttribute("lang") === lang ? "block" : "none";
+    });
+  };
+
+  languageToggle.addEventListener("change", () => {
+    const lang = languageToggle.checked ? "en" : "vi";
+    setLanguage(lang);
+  });
+
+  // Initialize default language on load
+  setLanguage(currentLanguage);
 
   // Enable/disable send button based on input
   userInput.addEventListener("input", () => {
@@ -31,7 +68,8 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: messageText,
-          enable_tts: ttsEnabled.checked,
+          language: currentLanguage, // Send current language to backend
+          enable_tts: false, // TTS is removed
         }),
       });
 
@@ -45,17 +83,12 @@ document.addEventListener("DOMContentLoaded", () => {
       hideLoadingIndicator();
 
       // 5. Append message
-      const botMessageElement = appendMessage("bot", data.response);
-
-      // 6. Chèn và phát audio nếu TTS được bật
-      if (ttsEnabled.checked && data.audio_url) {
-        playAudio(botMessageElement, data.audio_url);
-      }
+      appendMessage("bot", data.response);
     } catch (error) {
       console.error("Failed to send message:", error);
       // 7. Hide loading indicator and display an error
       hideLoadingIndicator();
-      appendMessage("bot", "Xin lỗi, đã có lỗi xảy ra. Vui lòng thử lại sau.");
+      appendMessage("bot", translations[currentLanguage].errorMessage);
     }
   };
 
@@ -103,34 +136,29 @@ document.addEventListener("DOMContentLoaded", () => {
     chatDisplay.scrollTop = chatDisplay.scrollHeight;
   };
 
-  // --- TTS Functions ---
+  const clearChat = () => {
+    if (confirm(translations[currentLanguage].clearConfirm)) {
+      // Clear all messages
+      chatDisplay.innerHTML = "";
 
-  const playAudio = (messageElement, audioUrl) => {
-    const audioWrapper = document.createElement("div");
-    audioWrapper.classList.add("inline-audio-player");
+      // Add back the initial greeting message
+      const greetingElement = document.createElement("div");
+      greetingElement.classList.add("message", "bot");
 
-    const audioElement = document.createElement("audio");
-    audioElement.setAttribute("controls", "");
-    audioElement.setAttribute("autoplay", "");
-    audioElement.playbackRate = 1.25;
+      const viGreeting = document.createElement("p");
+      viGreeting.setAttribute("lang", "vi");
+      viGreeting.textContent = translations.vi.greeting;
+      viGreeting.style.display = currentLanguage === "vi" ? "block" : "none";
 
-    const audioSource = document.createElement("source");
-    audioSource.setAttribute("src", audioUrl);
-    audioSource.setAttribute("type", "audio/wav");
+      const enGreeting = document.createElement("p");
+      enGreeting.setAttribute("lang", "en");
+      enGreeting.textContent = translations.en.greeting;
+      enGreeting.style.display = currentLanguage === "en" ? "block" : "none";
 
-    audioElement.appendChild(audioSource);
-
-    const separator = document.createElement("hr");
-    separator.classList.add("audio-separator");
-
-    messageElement.appendChild(separator);
-    audioWrapper.appendChild(audioElement);
-    messageElement.appendChild(audioWrapper);
-
-    audioElement.load();
-    audioElement.play().catch((error) => {
-      console.warn("Auto-play blocked, user must manually click play:", error);
-    });
+      greetingElement.appendChild(viGreeting);
+      greetingElement.appendChild(enGreeting);
+      chatDisplay.appendChild(greetingElement);
+    }
   };
 
   // --- Event Listeners ---
@@ -141,4 +169,5 @@ document.addEventListener("DOMContentLoaded", () => {
       sendMessage();
     }
   });
+  clearButton.addEventListener("click", clearChat);
 });
