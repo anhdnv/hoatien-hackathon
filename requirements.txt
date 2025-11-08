@@ -12,3 +12,6 @@ edge-tts
 aiohttp
 requests
 langdetect
+gunicorn
+langchain_tavily
+gtts
